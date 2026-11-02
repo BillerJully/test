@@ -1,0 +1,6 @@
+# HTTPS-сертификаты для доменов Caddy получает автоматически.
+# SITE_ADDRESS=":80" отключает HTTPS (например, для проверки по IP).
+{$SITE_ADDRESS} {
+	encode zstd gzip
+	reverse_proxy web:3000
+}
