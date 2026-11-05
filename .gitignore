@@ -5,5 +5,5 @@ next-env.d.ts
 *.tsbuildinfo
 npm-debug.log*
 .env*
-!.env.example
 .DS_Store
+data/

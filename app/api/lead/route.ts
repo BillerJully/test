@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { saveLead } from "@/lib/leads";
 
 export const dynamic = "force-dynamic";
 
@@ -16,29 +17,6 @@ function rateLimited(ip: string) {
   hits.set(ip, recent);
   if (hits.size > 10_000) hits.clear();
   return recent.length > MAX_PER_WINDOW;
-}
-
-const escapeHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-async function sendToTelegram(text: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatIds = (process.env.TELEGRAM_CHAT_ID ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-  if (!token || chatIds.length === 0) throw new Error("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are not set");
-
-  const api = process.env.TELEGRAM_API_URL || "https://api.telegram.org";
-  const results = await Promise.all(
-    chatIds.map(async (chatId) => {
-      const r = await fetch(`${api}/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", link_preview_options: { is_disabled: true } }),
-        signal: AbortSignal.timeout(10_000),
-      });
-      if (!r.ok) console.error(`[lead] Telegram ${chatId}: ${r.status} ${await r.text()}`);
-      return r.ok;
-    }),
-  );
-  if (!results.some(Boolean)) throw new Error("Telegram rejected the message");
 }
 
 export async function POST(req: NextRequest) {
@@ -64,20 +42,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
   }
 
-  const time = new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" });
-  const text = [
-    "<b>Новая заявка с annotica.ru</b>",
-    "",
-    `<b>Задача:</b> ${escapeHtml(task)}`,
-    "",
-    `<i>${time} МСК</i>`,
-  ].join("\n");
-
   try {
-    await sendToTelegram(text);
+    const lead = await saveLead(task);
+    console.log(`[lead] saved #${lead.id}`);
   } catch (err) {
-    console.error("[lead] failed to deliver:", err, JSON.stringify({ task }));
-    return NextResponse.json({ ok: false, error: "delivery_failed" }, { status: 502 });
+    console.error("[lead] failed to save:", err, JSON.stringify({ task }));
+    return NextResponse.json({ ok: false, error: "save_failed" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

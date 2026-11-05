@@ -25,24 +25,19 @@ docker compose up -d --build
 
 Шрифты лежат локально в `public/fonts`, поэтому сборке не нужен доступ к Google Fonts.
 
-## Заявки в Telegram
+## Заявки
 
-Форма «Оставить заявку» отправляет `POST /api/lead`, сервер пересылает заявку ботом в Telegram.
+Форма «Оставить заявку» отправляет `POST /api/lead`, сервер дописывает заявку в
+`/app/data/leads.jsonl` (Docker-том `leads_data`, переживает пересборку и перезапуск).
 
-1. Создайте `.env` на сервере рядом с `docker-compose.yml`:
-   ```bash
-   cp .env.example .env
-   ```
-   и впишите `TELEGRAM_BOT_TOKEN` (токен от @BotFather).
-2. Узнайте ID чата: напишите боту `/start` (или добавьте бота в группу и напишите там что-нибудь),
-   затем выполните на сервере и возьмите значение `"chat":{"id": ...}`:
-   ```bash
-   curl -s "https://api.telegram.org/bot$(grep ^TELEGRAM_BOT_TOKEN .env | cut -d= -f2)/getUpdates"
-   ```
-   Впишите его в `TELEGRAM_CHAT_ID` (для групп ID начинается с `-`; несколько — через запятую).
-3. Перезапустите: `docker compose up -d`.
+Посмотреть заявки:
 
-Ошибки доставки видны в `docker compose logs web`.
+```bash
+docker compose exec web node leads.mjs
+```
+
+Только последние 10: `docker compose exec web node leads.mjs 10`.
+Сырой файл: `docker compose exec web cat data/leads.jsonl`.
 
 Без compose:
 
