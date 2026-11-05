@@ -15,7 +15,7 @@ export default function Home() {
 
       <div className="title-block">
         <h1 className="wordmark">ANNOTICA</h1>
-        <p className="tagline">Мультимодальная платформа данных для ИИ · скоро</p>
+        <p className="tagline">Платформа обработки данных для ИИ · December 2026</p>
       </div>
     </main>
   );
