@@ -4,6 +4,9 @@ services:
     image: annotica:latest
     container_name: annotica
     restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
     expose:
       - "3000"
 

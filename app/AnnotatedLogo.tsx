@@ -29,7 +29,7 @@ export default function AnnotatedLogo() {
 
   return (
     <div className="logo">
-      <svg className="logo-svg" viewBox="0 0 640 640" aria-label="Annotica">
+      <svg className="logo-svg" viewBox="0 0 640 640" aria-hidden="true">
         <path d="M180 48 L552 348 L332 414 Z" fill="#f4f4f5" stroke="#f4f4f5" strokeWidth="18" strokeLinejoin="round" />
         <path d="M116 540 L578 400 L466 540 Z" fill="#f4f4f5" stroke="#f4f4f5" strokeWidth="18" strokeLinejoin="round" />
       </svg>
