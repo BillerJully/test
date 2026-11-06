@@ -1,18 +1,19 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import type { Dict } from "@/lib/content";
 
 const MAX_TASK = 4000;
 
 const LeadFormContext = createContext<() => void>(() => {});
 
-export function LeadFormProvider({ children }: { children: ReactNode }) {
+export function LeadFormProvider({ t, children }: { t: Dict["form"]; children: ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
     <LeadFormContext.Provider value={() => setOpen(true)}>
       {children}
-      {open && <LeadFormModal onClose={() => setOpen(false)} />}
+      {open && <LeadFormModal t={t} onClose={() => setOpen(false)} />}
     </LeadFormContext.Provider>
   );
 }
@@ -26,7 +27,7 @@ export function OpenLeadForm({ className, children }: { className: string; child
   );
 }
 
-function LeadFormModal({ onClose }: { onClose: () => void }) {
+function LeadFormModal({ t, onClose }: { t: Dict["form"]; onClose: () => void }) {
   const [task, setTask] = useState("");
   const [website, setWebsite] = useState("");
   const [tried, setTried] = useState(false);
@@ -65,13 +66,13 @@ function LeadFormModal({ onClose }: { onClose: () => void }) {
       if (!r.ok) throw new Error(String(r.status));
       setSent(true);
     } catch {
-      setSendError("Не удалось отправить. Попробуйте ещё раз.");
+      setSendError(t.failed);
     } finally {
       setSending(false);
     }
   }
 
-  const error = tried && empty ? "Опишите задачу." : sendError;
+  const error = tried && empty ? t.empty : sendError;
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -82,7 +83,7 @@ function LeadFormModal({ onClose }: { onClose: () => void }) {
         aria-labelledby="lead-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className="modal-close" aria-label="Закрыть" onClick={onClose}>
+        <button type="button" className="modal-close" aria-label={t.close} onClick={onClose}>
           ×
         </button>
 
@@ -90,31 +91,29 @@ function LeadFormModal({ onClose }: { onClose: () => void }) {
           <div className="sent">
             <span className="sent-icon">✓</span>
             <h2 id="lead-title" className="modal-title">
-              Заявка отправлена
+              {t.sentTitle}
             </h2>
-            <span className="sent-text">Спасибо! Мы получили описание задачи.</span>
+            <span className="sent-text">{t.sentText}</span>
             <button type="button" className="btn-secondary" onClick={onClose}>
-              Закрыть
+              {t.close}
             </button>
           </div>
         ) : (
           <form className="lead-form" onSubmit={submit} noValidate>
             <div className="modal-head">
               <h2 id="lead-title" className="modal-title">
-                Заявка на Корпус
+                {t.title}
               </h2>
-              <p className="modal-text">
-                Расскажите о задаче, подготовим доступ и покажем платформу на ваших данных.
-              </p>
+              <p className="modal-text">{t.text}</p>
             </div>
 
             <div className="fields">
               <label className="field">
-                <span>Задача</span>
+                <span>{t.task}</span>
                 <textarea
                   name="task"
                   rows={5}
-                  placeholder="Например: классификация 50 000 отзывов по темам"
+                  placeholder={t.placeholder}
                   maxLength={MAX_TASK}
                   value={task}
                   onChange={(e) => setTask(e.target.value)}
@@ -123,7 +122,7 @@ function LeadFormModal({ onClose }: { onClose: () => void }) {
                 />
               </label>
               <label className="hp" aria-hidden="true">
-                Сайт
+                {t.website}
                 <input
                   type="text"
                   name="website"
@@ -142,7 +141,7 @@ function LeadFormModal({ onClose }: { onClose: () => void }) {
             )}
 
             <button type="submit" className="btn-primary submit" disabled={sending}>
-              {sending ? "Отправляем…" : "Отправить заявку"}
+              {sending ? t.sending : t.send}
             </button>
           </form>
         )}

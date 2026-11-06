@@ -3,9 +3,9 @@
 import { useEffect, useState, type CSSProperties } from "react";
 
 const STEPS = [
-  { l: 22, t: 3, w: 68, h: 64, c: "#7fa6e8", label: "SAIL", score: "0.98" },
-  { l: 14, t: 58, w: 79, h: 29, c: "#6fc7a3", label: "HULL", score: "0.96" },
-  { l: 12, t: 2, w: 82, h: 87, c: "#f4f4f5", label: "LOGO", score: "0.99" },
+  { l: 22, t: 3, w: 68, h: 64, c: "var(--box1)", label: "SAIL", score: "0.98" },
+  { l: 14, t: 58, w: 79, h: 29, c: "var(--box2)", label: "HULL", score: "0.96" },
+  { l: 12, t: 2, w: 82, h: 87, c: "var(--box3)", label: "LOGO", score: "0.99" },
 ];
 
 const STEP_MS = 2400;
@@ -30,8 +30,8 @@ export default function AnnotatedLogo() {
   return (
     <div className="logo">
       <svg className="logo-svg" viewBox="0 0 640 640" aria-hidden="true">
-        <path d="M180 48 L552 348 L332 414 Z" fill="#f4f4f5" stroke="#f4f4f5" strokeWidth="18" strokeLinejoin="round" />
-        <path d="M116 540 L578 400 L466 540 Z" fill="#f4f4f5" stroke="#f4f4f5" strokeWidth="18" strokeLinejoin="round" />
+        <path d="M180 48 L552 348 L332 414 Z" fill="currentColor" stroke="currentColor" strokeWidth="18" strokeLinejoin="round" />
+        <path d="M116 540 L578 400 L466 540 Z" fill="currentColor" stroke="currentColor" strokeWidth="18" strokeLinejoin="round" />
       </svg>
       <div className="bbox" style={style} aria-hidden="true">
         <div className="bbox-label">
